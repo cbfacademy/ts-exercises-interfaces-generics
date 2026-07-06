@@ -1,8 +1,8 @@
 {
-    "name": "ts-exercises-template",
+    "name": "ts-exercises-interfaces-generics",
     "version": "1.0.0",
     "private": true,
-    "description": "Template for autograded TypeScript exercise repositories",
+    "description": "Session 3 exercise: Interfaces, type aliases, and generics",
     "scripts": {
         "format": "prettier --write .",
         "lint": "eslint exercise --no-error-on-unmatched-pattern",

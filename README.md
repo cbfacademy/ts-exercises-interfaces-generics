@@ -1,50 +1,52 @@
-# TypeScript Exercise Template
+# Session 3: Interfaces, type aliases, and generics
 
-This template repository is used to create autograded **TypeScript** exercise repositories for CBF Academy bootcamps. It includes a GitHub Classroom autograding workflow that scores student submissions on **functionality** and **code quality** by executing unit tests (Vitest) and submitting the code changes for review by an automated agent.
+**What you are practising:** converting a working but unsafe utility into a generic function the compiler can reason about.
 
-Use this template for plain-TypeScript exercises (`ts-exercises-<name>`). For React exercises, use the `ts-react-exercise-template` instead.
+## Setup
 
-## What's in here
+Accept the assignment, clone **your** repository, then install the tooling once:
 
-| Path                                          | Purpose                                                                     |
-| --------------------------------------------- | --------------------------------------------------------------------------- |
-| `exercise/`                                   | Where the starter code lives. Has its own strict `tsconfig.json`.           |
-| `tests/`                                      | Where the autograding unit tests live (`<name>.test.ts`).                   |
-| `vitest.config.ts`                            | Runs `tests/**` and writes JUnit XML to `test-results/junit.xml`.           |
-| `.github/workflows/classroom-autograding.yml` | Calls the shared reusable workflow with `toolchain: node`.                  |
-| `.github/workflows/typecheck.yml`             | Fast `npx tsc` feedback on every push once the starter is renamed to `.ts`. |
-| `package.json`                                | Shared tooling: Vitest, TypeScript, ESLint, Prettier.                       |
+```bash
+npm install
+```
 
-## Usage
+## The workflow
 
-1. Create a new repository from this template:
-    - **Template:** select this repository
-    - **Name:** use the `ts-exercises-<exercise name>` convention, e.g. `ts-exercises-core-types`
-    - **Visibility:** Public (needed for Classroom)
-2. After initialising, open the repo settings and mark it as a **template** so it can be used for assignments.
-3. Add the exercise on the `main` branch:
-    - Put the starter in `exercise/` (e.g. `exercise/calculator.js`). **Export** every function the tests import, so the grader can reach them.
-    - Put the unit tests in `tests/` (e.g. `tests/calculator.test.ts`), importing from `../exercise/<file>`.
-    - Replace this README with the exercise brief for students.
-4. Create a `solutions` branch and commit a reference solution to it (the renamed `.ts`, fully typed, bugs fixed). Confirm `npm test` is green against it.
-5. Push all branches.
+1. Open a terminal in the `exercise/` folder.
+2. Rename the starter: `mv group-by.js group-by.ts`.
+3. Work through what the compiler surfaces.
+4. Compile with a bare `npx tsc`. Not `npx tsc group-by.ts`: a filename argument makes `tsc` skip `tsconfig.json`, so the strict settings would not apply.
+5. Run the output: `node group-by.js`.
 
-## Testing (Classroom assignment settings)
+## Your task
 
-Create a new Classroom assignment using the exercise repo as the starter template, with:
+The file contains `groupBy`, a utility that groups items in an array by a key. The JavaScript version works, but it has no type safety and will happily do nonsense if you pass it the wrong inputs.
 
-- **Repository visibility:** Private
-- **Grant students admin access to their repository:** Disabled
-- **Copy the default branch only:** Enabled (keeps the `solutions` branch private)
-- **Supported editor:** Don't use an online IDE
-- **Protected file paths:** `.github/**/*`, `**/tests/**/*` — so students cannot edit the workflows or the autograding tests
-- **Enable feedback pull requests:** Enabled
+1. Rename `group-by.js` to `group-by.ts`.
+2. Convert the function to a generic that takes:
+    - an array of items of type `T`
+    - a key-selector function that returns a `string` given a `T`
+3. Return a `Record<string, T[]>` (a lookup of group name to items).
+4. Add a small test block that groups an array of learners by the first letter of their name.
+5. Compile with `npx tsc` and run it with `node group-by.js`.
 
-Then accept the assignment from a test account, commit and push, and review the Actions output and the Feedback PR comment to confirm everything works.
+The starter ends with two commented-out nonsense calls. Once your conversion is done, uncomment them and check the compiler rejects both.
 
-## How grading works
+Keep the exported function name (`groupBy`) — the autograder imports it by name.
 
-- **Functionality** comes from the Vitest suite: the reusable workflow runs `npm ci && npm test`, parses `test-results/junit.xml`, and scales the pass rate to 5 points.
-- **Code quality** comes from the automated agent review of the submission, scaled to 5 points.
+## Stretch goals
 
-> Note: for exercises whose only defect is a **type** error (nothing wrong at runtime), Vitest cannot distinguish a finished submission from the starter — the `typecheck.yml` check and the agent review are what catch untyped work. Design at least one **runtime-observable** requirement per exercise where you want the functionality score to reflect real progress.
+- Make the key selector generic too. What happens if you let it return any type, not just `string`? What type would the returned `Record` need to be?
+- Add a second function, `partition`, which splits an array in two based on a predicate. Type it generically.
+- Does your `groupBy` handle an empty array? What about an array with one item?
+
+## Done when
+
+`npx tsc` completes with no errors, the nonsense calls fail to compile when uncommented, `node group-by.js` prints your groupings (including the learners test block), and your work is committed and pushed.
+
+## How your work is graded
+
+Every push runs two GitHub Actions checks:
+
+- **Type check** — runs `npx tsc` on your exercise under the strict settings, once you have renamed the starter to `.ts`.
+- **Autograding** — runs an automated test suite (Vitest) against your functions and reports a functionality score, plus an automated code-quality review.
